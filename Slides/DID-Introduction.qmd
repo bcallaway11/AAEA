@@ -17,7 +17,8 @@ knitr:
 library(revealEquations)
 ```
 
-## Plan for the Workshop
+<!--## Plan for the Workshop-->
+## Plan for the Session 
 $\newcommand{\E}{\mathbb{E}}
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\var}{\mathrm{var}}
@@ -63,13 +64,12 @@ $\newcommand{\E}{\mathbb{E}}
 
 ## Additional Resources
 
-<!--<span class="alert">Additional Workshop Materials: </span> [https://bcallaway11.github.io/lsu-workshop/](https://bcallaway11.github.io/lsu-workshop/)
+<span class="alert">Additional Session Materials: </span> [https://bcallaway11.github.io/AAEA/](https://bcallaway11.github.io/AAEA/)
 
-  * Slides, code, etc. for the workshop
+  * Slides, code, etc. <!--for the workshop-->
 
 . . .
 
--->
 
 <span class="alert">References: </span> 
 
