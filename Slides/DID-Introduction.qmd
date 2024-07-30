@@ -17,8 +17,9 @@ knitr:
 library(revealEquations)
 ```
 
-<!--## Plan for the Workshop-->
+
 ## Plan for the Session 
+<!--## Plan for the Workshop-->
 $\newcommand{\E}{\mathbb{E}}
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\var}{\mathrm{var}}
@@ -93,7 +94,7 @@ $\newcommand{\E}{\mathbb{E}}
 
 
 
-## Setting
+## Natural Experimental Setting
 
 <span class="alert">Exploit a data structure where the researcher observes:</span>
 
@@ -307,7 +308,7 @@ $$\\color{red}{\\E[\\Delta Y_i(0) | G_i=1]} = \\E[\\Delta Y_i(0) | G_i=0]$$
 
 :::
 
-<br>
+<div style=\"margin-top: 10px;\"></div>
 
 Explanation: Mean path of untreated potential outcomes is the same for the treated group as for the untreated group
 
@@ -469,7 +470,7 @@ Explanation: $ATT$ when units have been treated for $e$ periods
 <span class="alert">Overall ATT</span>
 
 Towards this end: the average treatment effect for unit $i$</span> (across its post-treatment time periods) is given by:
-$$\bar{\tau}_i(g) = \frac{1}{\T - g + 1} \sum_{t=g}^{\T} \Big( Y_{i,t}(g) - Y_{i,t}(0) \Big)$$
+$$\bar{\tau}_i(G_i) = \frac{1}{\T - G_i + 1} \sum_{t=G_i}^{\T} \Big( Y_{i,t}(G_i) - Y_{i,t}(0) \Big)$$
 
 . . .
 
@@ -487,9 +488,69 @@ Explanation: $ATT$ across all units that every participate in the treatment
 
 :::
 
-## Target Parameters
 
-To understand the discussion later, it is also helpful to think of $ATT(g,t)$ as a <span class="alert">building block</span> for the other parameters discussed above.  In particular:
+## Pros and Cons of Aggregating Causal Effect Parameters
+
+:::: {.columns}
+
+::: {.column width="45%"}
+<div style="margin-top: 150px;"></div>
+
+#### Group-Time $ATT(g,t)$
+- More fully characterizes treatment effect heterogeneity.
+- Some theories may have testable implications on $ATT(g,t)$ (e.g., on the sign of group-time average treatment effects).
+:::
+
+::: {.column width="10%" .text-center }
+<div style="margin-top: 150px">
+  <span style="font-size: 2em; transform: rotate(-30deg); display: inline-block; color: #333; ">⟶</span>
+</div>
+
+<div style="margin-top: 100px">
+  <span style="font-size: 2em; transform: rotate(30deg); display: inline-block; color: #333;">⟶</span>
+</div>
+:::
+
+::: {.column width="45%"}
+<div style="margin-top: 50px"></div>
+
+#### Event Study $ATT^{ES}(e)$
+- Easier to estimate precisely
+- Easier to report - summarizes treatment effect dynamics in a two-dimensional plot.
+:::
+
+::: {.column width="55%"}
+:::
+
+
+::: {.column width="45%"}
+<div style="margin-top: -100px;"></div>
+
+#### Overall $ATT^o$
+- Easiest to estimate precisely
+- Easiest to report - summarizes causal effects into single number to report in abstract or introduction.
+:::
+
+::::
+
+
+## $ATT(g,t)$ as a Building Block
+
+To understand the discussion later, it is also helpful to think of $ATT(g,t)$ as a <span class="alert">building block</span> for the other parameters discussed above. For example:
+
+. . .
+
+[Overall ATT]{.alert}
+\begin{align*}
+  ATT^o = \sum_{g \in \bar{\mathcal{G}}} \sum_{t=g}^{\T} w^o(g,t) ATT(g,t) \qquad \qquad \textrm{where} \quad w^o(g,t) = \frac{\P(G_i=g|U_i=0)}{\T-g+1}
+\end{align*}
+
+. . .
+
+Likewise, can show that $ATT^{es}(e)$ is a weighted average of $ATT(g,g+e)$
+
+
+<!--In particular:
 
 :::: {.columns}
 
@@ -527,11 +588,14 @@ To understand the discussion later, it is also helpful to think of $ATT(g,t)$ as
 
 :::::
 
+-->
+
+
 . . .
 
 <br>
 
-In other words, if we can identify/recover $ATT(g,t)$, then we can proceed to recover $ATT^{es}(e)$ and $ATT^o$.
+$\implies$ If we can identify/recover $ATT(g,t)$, then we can proceed to recover $ATT^{es}(e)$ and $ATT^o$.
 
 
 
@@ -655,7 +719,7 @@ Second, under parallel trends:
 
 3. @wooldridge-2021, R: `etwfe`, Stata: `JWDID`
 
-4. @gardner-thakral-to-yap-2023 / @borusyak-jaravel-spiess-2023, R: `did2s`, Stata: `did2s` and `did_imputation`
+4. @gardner-thakral-to-yap-2023 / @borusyak-jaravel-spiess-2024, R: `did2s`, Stata: `did2s` and `did_imputation`
 
 . . .
 
@@ -830,6 +894,8 @@ It is fair to see this as a way to <span class="alert">trade-off robustness and 
 
 * If parallel trends is violated in some pre-treatment periods but holds post-treatment, Wooldridge estimates will be inconsistent, but SA estimates will be robust to violations of parallel trends in pre-treatment periods.
 
+* See @harmon-2023 for more details
+
 ## Comparison 3: Wooldridge and Gardner/BJS
 
 Wooldridge and Gardner/BJS give numerically the same estimates: $\hat{\alpha}^W_{gt} = \widehat{ATT}^{G/BJS}(g,t)$
@@ -851,10 +917,10 @@ The above discussion emphasizes the conceptual similarities between different pr
 
 The other major source of differences in estimates across procedures is [different default options]{.alert} in software implementations.  [Examples:]{.alert}
 
-1. Base Periods
+1. Different base periods
     * It's possible to come up with an imputation estimator that uses the base period right before treatment only $\implies$ $\uparrow$ robustness, $\downarrow$ efficiency
     * It's also possible to do a version of CS with more base periods $\implies$ $\uparrow$ efficiency $\downarrow$ robustness
-        * Build-the-trend (i.e., path relative to average pre-treatment outcome) and GMM, Callaway (2023), Marcus and Sant'Anna (2021), Lee and Wooldridge (2023).
+        * Build-the-trend (i.e., path relative to average pre-treatment outcome) and GMM, @callaway-2023, @marcus-santanna-2021, @lee-wooldridge-2023.
 
 
 
@@ -864,7 +930,7 @@ The above discussion emphasizes the conceptual similarities between different pr
 
 The other major source of differences in estimates across procedures is [different default options]{.alert} in software implementations.  [Examples:]{.alert}
 
-2. Overall average treatment effects 
+2. Different default target parameters 
     * CS emphasizes the "overall" treatment effects discussed above
     * Default implementations of imputation run a regression of $Y_{i,t}-\hat{Y}_{i,t}(0)$ on $D_{i,t}$ which delivers the "simple" overall average treatment effect which just averages all available treatment effects
     
@@ -885,6 +951,30 @@ My two favorite of the new estimation procedures are:
   * More flexible approach for including covariates, which we haven't talked about here, but are important in applications and also connects well with literature on doubly robust estimation and machine learning
 
 :::
+
+## Comments {visibility="uncounted"}
+
+The above discussion emphasizes the conceptual similarities between different proposed alternatives to TWFE regressions in the literature.
+
+The other major source of differences in estimates across procedures is [different default options]{.alert} in software implementations.  [Examples:]{.alert}
+
+3. Different default comparison groups 
+    * CS and SA by default use the never-treated group as the comparison group
+    * Wooldridge and Gardner/BJS by default use all untreated observations as the comparison group
+    * But (again) it is straightforward to adapt CS to use the not-yet-treated group as the comparison group, or even a customized comparison group (e.g., not-yet-but-eventually-treated)
+
+
+
+## Comments {visibility="uncounted"}
+
+The above discussion emphasizes the conceptual similarities between different proposed alternatives to TWFE regressions in the literature.
+
+The other major source of differences in estimates across procedures is [different default options]{.alert} in software implementations.  [Examples:]{.alert}
+
+4. Handle covariates in different ways
+    * By default, imputation (effectively) uses changes in the covariates over time in estimation
+    * CS includes the level of the time-varying covariate in period $g-1$.
+    * In @caetano-callaway-2023, we recommend including both changes and levels of covariates
 
 <!--
 
@@ -1144,17 +1234,9 @@ One more comment: there is a lot concern about [negative weights]{.alert} (both 
 :::
 
 
-## Discussion 
-
-<center><h1>Pros and Cons of New Approaches Relative to Traditional TWFE Regressions</h1></center>
-
-<!--
-
 ## Conclusion
 
-<br>
-
-<center><h1>Should You Use These New Approaches?</h1></center> -->
+<center><h1>Pros and Cons of New Approaches Relative to Traditional TWFE Regressions</h1></center>
 
 [Not a Panacea]{.alert}
 
@@ -1163,20 +1245,6 @@ One more comment: there is a lot concern about [negative weights]{.alert} (both 
 ::: {.notes}
 
 * If you're doing DID, your first concern should be about the identification strategy itself
-
-:::
-
-[Advantages:]{.alert}
-
-* Off-the-shelf robust to treatment effect heterogeneity 
-
-* Arguably, simpler and more transparent
-
-* Direct implementation of the DID identification strategy
-
-:::{.notes}
-
-* Not sure if this is a good analogy, but I am currently teaching 1st year econometrics for ph.d. students, and a classic topic in that class is about standard errors and homoskedasiticity and heteroskedasicity.  I am not against calculating standard errors under homoskedasticity if you say that you are assuming homoskedasticity (and have a good reason to believe it or test for it, etc.), but I am against saying that standard errors are robust to heterogeneity and then computing standard errors under homoskedasticity.  Its true that this choice may not "change the results" in a good fraction of applications, but it still isn't right.  If you are willing to say that you assume that treatment effects don't change across groups and time periods, then TWFE is all good, but, to me, it doesn't make sense to say that you are *only* assuming parallel trends (w/o restricting TE het.) and then run a traditional TWFE regression.
 
 :::
 
@@ -1191,6 +1259,21 @@ One more comment: there is a lot concern about [negative weights]{.alert} (both 
 * That said, not clear that this is necessarily a disadvantage.  What we know about TWFE regressions is that they are generally equal to weighted averages of underlying causal effect parameters (this has been shown in many more complicated settings than the staggered treatment case we talked about today), but the weights are non-transparent and driven by the estimation method.
 
 * This means that *you* and the *regression* are basically agreed on the underlying components of a summary treatment effect parameter, and that you have a problem about combining information, the regression will *make a choice for you* but based on what we know about existing cases, usually the regression doesn't make good choices...don't think we should punt on these problems, and think that explicitly proposing ways to combine information should an important consideration in empirical work in economics.
+
+:::
+
+
+[Advantages:]{.alert}
+
+* Off-the-shelf robust to treatment effect heterogeneity 
+
+* Arguably, simpler and more transparent
+
+* Direct implementation of the DID identification strategy
+
+:::{.notes}
+
+* Not sure if this is a good analogy, but I am currently teaching 1st year econometrics for ph.d. students, and a classic topic in that class is about standard errors and homoskedasiticity and heteroskedasicity.  I am not against calculating standard errors under homoskedasticity if you say that you are assuming homoskedasticity (and have a good reason to believe it or test for it, etc.), but I am against saying that standard errors are robust to heterogeneity and then computing standard errors under homoskedasticity.  Its true that this choice may not "change the results" in a good fraction of applications, but it still isn't right.  If you are willing to say that you assume that treatment effects don't change across groups and time periods, then TWFE is all good, but, to me, it doesn't make sense to say that you are *only* assuming parallel trends (w/o restricting TE het.) and then run a traditional TWFE regression.
 
 :::
 
@@ -1269,7 +1352,7 @@ One possibility is to condition on (i.e., treat as fixed/non-random) $(G_i, \the
 
 * Adjusted parallel trends: mean of finite sample parallel trends across repeated samples $$\frac{1}{n_g} \sum_{G_i=g} \E[\Delta Y_{i,t}(0) | G_i=g] - \frac{1}{n_\infty} \sum_{G_i=\infty} \E[\Delta Y_{i,t}(0) | U_i=1]$$
 
-$\implies$ somewhat different interpretation, but use same $\widehat{ATT}$ and constructing unconditional standard errors (i.e., same as before) can be conservative in this case.  See @borusyak-jaravel-spiess-2023, for example.
+$\implies$ somewhat different interpretation, but use same $\widehat{ATT}$ and constructing unconditional standard errors (i.e., same as before) can be conservative in this case.  See @borusyak-jaravel-spiess-2024, for example.
 
 ## Clustered Treatment Assignment
 
